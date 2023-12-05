@@ -7,8 +7,8 @@ import numpy as np
 from utils import book_name_code_map
 
 class ProcessBSBEnglish:
-    def __init__(self, filepath, output_folder="bsb_usfms"):
-        self.bsb_df = pd.read_csv(filepath, delimiter='\t')
+    def __init__(self, filepath, excel_sheet, header_row,output_folder="bsb_usfms"):
+        self.bsb_df = pd.read_excel(filepath, sheet_name=excel_sheet, header=header_row)
         self.ref_pattern = re.compile(r'(\d? ?[\w ]+) (\d+):(\d+)')
         self.output_folder=output_folder
         self.current_book = ""
@@ -71,6 +71,8 @@ class ProcessBSBEnglish:
                 out_file.write(self.usfm_str)
 
 if __name__ == "__main__":
-    input_csv = 'input/bsb_tables.csv'
+    input_excel = 'input/bsb_tables.xlsx'
+    excel_sheet = 'biblosinterlinear96'
+    header_row = 1
     output_folder = 'output/bsb_usfms'
-    ProcessBSBEnglish(input_csv, output_folder)
+    ProcessBSBEnglish(input_excel, excel_sheet, header_row, output_folder)
