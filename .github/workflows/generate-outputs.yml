@@ -32,7 +32,6 @@ jobs:
     
     - name: Generate USFM files
       run: |
-        ls input
         python scripts/processBSBEnglish.py
         python scripts/processWLCHebrew.py
         python scripts/processNestleGreek.py 
