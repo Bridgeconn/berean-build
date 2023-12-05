@@ -50,7 +50,7 @@ class ProcessBSBEnglish:
         ref_book = ref_match.group(1)
         ref_chapter = ref_match.group(2)
         ref_verse = ref_match.group(3)
-        print(f"{ref_book=} {ref_chapter=} {ref_verse=}")
+        # print(f"{ref_book=} {ref_chapter=} {ref_verse=}")
         book_code = book_name_code_map[ref_book]
         if book_code != self.current_book:
             self.save_one_book()
@@ -69,6 +69,7 @@ class ProcessBSBEnglish:
         if self.usfm_str != "":
             with open(f'{self.output_folder}/bsb_{self.current_book}.usfm', 'w', encoding='utf-8') as out_file:
                 out_file.write(self.usfm_str)
+            print(f"Saves {self.current_book}")
 
 if __name__ == "__main__":
     input_excel = 'input/bsb_tables.xlsx'
