@@ -4,7 +4,7 @@ Converting the Berean Study Bible in XLSX format to USFM format.
 
 ## Whats in this repo?
 
-* **Input**: The Berean Study Bible content in XLSX format. Also the converted CSV file of the same for easier processing. These are available in [the input folder](./input)
+* **Input**: The Berean Study Bible content in XLSX format. This is available in [the input folder](./input)
 
 * **Output**: 3 sets of USFMS for the English BSB, Hebrew WLC and Greek Nestle Bibles. Available in [the output folder](./output) 
 	* English BSB USFMs (One for each of 66 books) with  
