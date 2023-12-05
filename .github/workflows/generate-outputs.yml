@@ -1,0 +1,42 @@
+# This workflow will install Python dependencies, run the scripts to generate output and commit it back to the same branch
+
+name: Berean-Build
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.head_ref }}
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Generate USFM files
+      run: |
+        python scripts/processBSBEnglish.py
+        python scripts/processWLCHebrew.py
+        python scripts/processNestleGreek.py 
+    
+    - name: Commit generated files back to repo
+      uses: stefanzweifel/git-auto-commit-action@v5
+      with:
+        commit_message: Generate output via CI-CD(github actions)
+      
