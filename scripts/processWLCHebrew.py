@@ -7,8 +7,8 @@ import numpy as np
 from utils import book_name_code_map
 
 class ProcessWLCHebrew:
-    def __init__(self, filepath, output_folder="heb_usfms"):
-        self.bsb_df = pd.read_csv(filepath, delimiter='\t')
+    def __init__(self, filepath, excel_sheet, header_row, output_folder="heb_usfms"):
+        self.bsb_df = pd.read_excel(filepath, sheet_name=excel_sheet, header=header_row)
         self.ref_pattern = re.compile(r'(\d? ?[\w ]+) (\d+):(\d+)')
         self.output_folder=output_folder
         self.current_book = ""
@@ -31,9 +31,9 @@ class ProcessWLCHebrew:
            verse_start = self.process_verse(row)
         if verse_start!="":
             self.usfm_str += verse_start
-        if row['WLC / Nestle Base'] is not np.NaN:
+        if row['WLC / Nestle Base {TR} ⧼RP⧽ (WH) 〈NE〉 [NA] ‹SBL› [[ECM]]'] is not np.NaN:
             self.usfm_str += f"\\w "
-            self.usfm_str += f"{row['WLC / Nestle Base']} |"
+            self.usfm_str += f"{row['WLC / Nestle Base {TR} ⧼RP⧽ (WH) 〈NE〉 [NA] ‹SBL› [[ECM]]']} |"
             if not pd.isna(row['Strongs']):
                 self.usfm_str += f"strong=\"{int(row['Strongs'])}\" "
             if not pd.isna(row['Parsing']):
@@ -49,7 +49,7 @@ class ProcessWLCHebrew:
         ref_book = ref_match.group(1)
         ref_chapter = ref_match.group(2)
         ref_verse = ref_match.group(3)
-        print(f"{ref_book=} {ref_chapter=} {ref_verse=}")
+        # print(f"{ref_book=} {ref_chapter=} {ref_verse=}")
         book_code = book_name_code_map[ref_book]
         if book_code != self.current_book:
             self.save_one_book()
@@ -67,8 +67,11 @@ class ProcessWLCHebrew:
         if self.usfm_str != "":
             with open(f'{self.output_folder}/heb_{self.current_book}.usfm', 'w', encoding='utf-8') as out_file:
                 out_file.write(self.usfm_str)
+            print(f"Saves {self.current_book}")
 
 if __name__ == "__main__":
-    input_csv = 'input/bsb_tables.csv'
+    input_excel = 'input/bsb_tables.xlsx'
+    excel_sheet = 'biblosinterlinear96'
+    header_row = 1
     output_folder = 'output/heb_usfms'
-    ProcessWLCHebrew(input_csv, output_folder)
+    ProcessWLCHebrew(input_excel, excel_sheet, header_row, output_folder)

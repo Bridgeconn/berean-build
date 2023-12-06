@@ -4,7 +4,7 @@ Converting the Berean Study Bible in XLSX format to USFM format.
 
 ## Whats in this repo?
 
-* **Input**: The Berean Study Bible content in XLSX format. Also the converted CSV file of the same for easier processing. These are available in [the input folder](./input)
+* **Input**: The Berean Study Bible content in XLSX format. This is available in [the input folder](./input)
 
 * **Output**: 3 sets of USFMS for the English BSB, Hebrew WLC and Greek Nestle Bibles. Available in [the output folder](./output) 
 	* English BSB USFMs (One for each of 66 books) with  
@@ -52,3 +52,17 @@ python scripts/processBSBEnglish.py
 python scripts/processWLCHebrew.py
 python scripts/processNestleGreek.py 
 ```
+
+## Github Actions
+
+Continuous Integration is enabled on this repo for automatically generating outputs via [github actions](./.github/workflows/generate-outputs.yml).
+
+* Upon any change(push) to contents of input folder on the repo, or via manual trigger
+* ... the scripts will be run on the inputfile in that branch
+* ... generating corresponding output files in the output folder.
+* These changes will be committed and pushed back to the same branch.
+* The commit message and author will indcate that it is done by bot.
+* If the generated files are same as that already present in the repo, commit will fail and no changes will be pushed.(The workflow run will be success though)
+
+If there is a change in the data, just add that new excel file to the input folder under same file name and with same column names inside. If done on github, or pushed to github, it will trigger this workflow and generate the corresponding outputs automatically. The updated outputs will be available in the output folder in the github repo itself. ( :warning: Workflow takes more that 15 minutes to complete.)
+
