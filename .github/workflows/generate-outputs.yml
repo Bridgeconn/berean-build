@@ -4,6 +4,8 @@ name: Berean-Build
 
 on:
   push:
+    paths: 
+      - 'input/*'
   workflow_dispatch:
 
 permissions:
