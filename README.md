@@ -57,12 +57,12 @@ python scripts/processNestleGreek.py
 
 Continuous Integration is enabled on this repo for automatically generating outputs via [github actions](./.github/workflows/generate-outputs.yml).
 
-* Upon any change(push) on the repo, or via manual trigger
+* Upon any change(push) to contents of input folder on the repo, or via manual trigger
 * ... the scripts will be run on the inputfile in that branch
 * ... generating corresponding output files in the output folder.
 * These changes will be committed and pushed back to the same branch.
 * The commit message and author will indcate that it is done by bot.
 * If the generated files are same as that already present in the repo, commit will fail and no changes will be pushed.(The workflow run will be success though)
 
-If there is a change in the data, just add that excel new file to the inputs folder under same file name and same column names inside. If done on github, or pushed to github, it will trigger this workflow and generate the corresponding outputs automatically. The updated outputs will be available in the output folder in the github repo itself. ( :warning: Workflow takes more that 15 minutes to complete.)
+If there is a change in the data, just add that new excel file to the input folder under same file name and with same column names inside. If done on github, or pushed to github, it will trigger this workflow and generate the corresponding outputs automatically. The updated outputs will be available in the output folder in the github repo itself. ( :warning: Workflow takes more that 15 minutes to complete.)
 
