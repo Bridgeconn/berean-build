@@ -10,6 +10,7 @@ class ProcessBSBEnglish:
     def __init__(self, filepath, excel_sheet, header_row,output_folder="bsb_usfms"):
         self.bsb_df = pd.read_excel(filepath, sheet_name=excel_sheet, header=header_row)
         self.ref_pattern = re.compile(r'(\d? ?[\w ]+) (\d+):(\d+)')
+        self.html_pattern = re.compile(r'\<.*\>')
         self.output_folder=output_folder
         self.current_book = ""
         self.current_chapter = ""
@@ -45,7 +46,9 @@ class ProcessBSBEnglish:
         if not pd.isna(row['Verse']):
            verse_start = self.process_verse(row)
         if not pd.isna(row['Heading']):
-            self.usfm_str += f"\n\\s {row['Heading']}\n\\p\n"
+            sect_heading = row['Heading']
+            sect_heading = re.sub(self.html_pattern, "", sect_heading)
+            self.usfm_str += f"\n\\s {sect_heading}\n\\p\n"
         if verse_start!="":
             self.usfm_str += verse_start
         if not pd.isna(row['Cross References']):
