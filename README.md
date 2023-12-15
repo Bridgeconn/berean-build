@@ -30,6 +30,15 @@ Converting the Berean Study Bible in XLSX format to USFM format.
 		```
 		\w Πέτρος |strong="4074" x-morph="N-NMS" x-translit="Petros"\w*\w ἀπόστολος |strong="652" x-morph="N-NMS" x-translit="apostolos"\w* 
 		```
+
+	* Word-alignment information provided, extracted as follows:
+
+    	* `bsb_text.txt` with one verse per line
+    	* `heb_grk_text.txt` also with one verse per line
+    	* `bsb_to_heb_or_grk_alignment.txt` with word alignment between bsb and source Hebrew or Greek in Pharaoh format
+    	* `verf.txt` the reference index for the above 3 files
+
+
 * **Scripts**: Scripts to process the input and generate these outputs are provided in [the scripts folder](./scripts)
 
 ## How to run the scripts?
@@ -52,6 +61,10 @@ python scripts/processBSBEnglish.py
 python scripts/processWLCHebrew.py
 python scripts/processNestleGreek.py 
 ```
+
+4. Generate Alignment
+
+`python scripts/processAlignment.py`
 
 ## Github Actions
 
