@@ -36,6 +36,7 @@ class ProcessWLCHebrew:
             self.usfm_str += f"{row['WLC / Nestle Base {TR} ⧼RP⧽ (WH) 〈NE〉 [NA] ‹SBL› [[ECM]]']} |"
             if not pd.isna(row['Strongs']):
                 self.usfm_str += f"strong=\"{int(row['Strongs'])}\" "
+                self.usfm_str += f"link-href=\"./Strongs_dictionary.md#{row['Language'][0].lower()}{int(row['Strongs'])}\" "
             if not pd.isna(row['Parsing']):
                 self.usfm_str += f"x-morph=\"{row['Parsing']}\" ".replace("|", "/")
             if not pd.isna(row['Translit']):
