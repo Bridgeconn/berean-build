@@ -38,6 +38,4 @@ if __name__== '__main__':
     header_row = 1
     output_folder = 'output/'
     ProcessDictionary(input_excel, excel_sheet, header_row, output_folder)
-
-
         
