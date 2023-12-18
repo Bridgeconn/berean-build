@@ -11,6 +11,8 @@ class ProcessBSBEnglish:
         self.bsb_df = pd.read_excel(filepath, sheet_name=excel_sheet, header=header_row)
         self.ref_pattern = re.compile(r'(\d? ?[\w ]+) (\d+):(\d+)')
         self.html_pattern = re.compile(r'\<.*\>')
+        self.footnote_span_start_pattern = re.compile(r'\<span class=\|fnv\|\>')
+        self.footnote_span_end_pattern = re.compile(r'\</span\>')
         self.output_folder=output_folder
         self.current_book = ""
         self.current_chapter = ""
@@ -67,6 +69,11 @@ class ProcessBSBEnglish:
                 self.usfm_str += f"strong=\"{int(row['Strongs'])}\" "
             self.usfm_str += f"srcloc=\"{bib}:{self.current_book}.{self.current_chapter}.{self.current_verse}.{int(wrd_index)}\" "
             self.usfm_str += "\\w* "
+        if row['Footnotes'] is not np.NaN:
+            footnote_text = row['Footnotes'].replace("<i>", '"').replace("</i>", '"')
+            footnote_text = re.sub(self.footnote_span_start_pattern, f"({self.current_book}.{self.current_chapter}.", footnote_text)
+            footnote_text = re.sub(self.footnote_span_end_pattern, f") ", footnote_text)
+            self.usfm_str += f'\\f + \\fr {self.current_chapter}.{self.current_verse} \\ft {footnote_text} \\f* '
     
     def process_verse(self, row):
         ref_match = re.match(self.ref_pattern, row['Verse'])
