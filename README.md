@@ -12,7 +12,7 @@ Converting the Berean Study Bible in XLSX format to USFM format.
 		* cross-refs (and footnotes -TBD)  
 		* section headings.  
 		* Phrase level markup using \w with attributes  
-			* Strong (and link-href ?) 
+			* Strong 
 			* Srcloc, indicating alignment to source bible words 
 
 		```
@@ -21,10 +21,8 @@ Converting the Berean Study Bible in XLSX format to USFM format.
 
 	* Nestle Greek and WLC Hebrew source bibles in separate USFMs (39 for Heb and 27 for Grk) with following attributes in \w encloded words 
 
-		* Strong (and link-href ?) 
-
+		* Strong and link-href (to the entries in `Strongs_dictionary.md`) 
 		* x-morph 
-
 		* x-translit 
 
 		```
@@ -37,6 +35,8 @@ Converting the Berean Study Bible in XLSX format to USFM format.
     	* `heb_grk_text.txt` also with one verse per line
     	* `bsb_to_heb_or_grk_alignment.txt` with word alignment between bsb and source Hebrew or Greek in Pharaoh format
     	* `verf.txt` the reference index for the above 3 files
+
+    * Greek and Hebrew Strongs numbers and their description in `Strongs_dictionary.md`
 
 
 * **Scripts**: Scripts to process the input and generate these outputs are provided in [the scripts folder](./scripts)
@@ -65,6 +65,10 @@ python scripts/processNestleGreek.py
 4. Generate Alignment
 
 `python scripts/processAlignment.py`
+
+5. Generate Strongs Dictionary
+
+`python scripts/processDictionary.py`
 
 ## Github Actions
 
