@@ -14,6 +14,8 @@ class ProcessAlignment:
                  filepath, excel_sheet, header_row,output_folder="berean-build/output"):
         self.bsb_df = pd.read_excel(filepath, sheet_name=excel_sheet, header=header_row)
         self.ref_pattern = re.compile(r'(\d? ?[\w ]+) (\d+):(\d+)')
+        self.null_align_pattern = re.compile(r'\B\-\B')
+
 
         self.align_df = pd.DataFrame( columns=["vref","source","target","alignment"])
         self.align_df.set_index('vref', inplace=True)
@@ -61,10 +63,13 @@ class ProcessAlignment:
                 trg_word_count = target_index - self.trg_start_indices[self.current_ref] + 1
     
             if not pd.isna(row["BSB Version"]):
-                self.source_text.append(str(row["BSB Version"]).strip())
-                self.src_word_count += 1
-                if trg_word_count is not None:
-                    self.alignment.append(f"{self.src_word_count}-{trg_word_count}")
+                if re.search(self.null_align_pattern, str(row['BSB Version'])):
+                    pass
+                else:
+                    self.source_text.append(str(row["BSB Version"]).strip())
+                    self.src_word_count += 1
+                    if trg_word_count is not None:
+                        self.alignment.append(f"{self.src_word_count}-{trg_word_count}")
         except Exception as exce:
             print(f"Issue at {row=}")
             print(exce)
