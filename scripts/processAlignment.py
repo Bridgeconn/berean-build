@@ -64,7 +64,9 @@ class ProcessAlignment:
     
             if not pd.isna(row["BSB Version"]):
                 if re.search(self.null_align_pattern, str(row['BSB Version'])):
-                    pass
+                    cell_text = re.sub(self.null_align_pattern, "", str(row['BSB Version'])).strip()
+                    if cell_text != "":
+                        self.source_text.append(cell_text)
                 else:
                     self.source_text.append(str(row["BSB Version"]).strip())
                     self.src_word_count += 1
