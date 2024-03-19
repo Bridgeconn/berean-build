@@ -13,6 +13,7 @@ class ProcessBSBEnglish:
         self.html_pattern = re.compile(r'\<.*\>')
         self.footnote_span_start_pattern = re.compile(r'\<span class=\|fnv\|\>')
         self.footnote_span_end_pattern = re.compile(r'\</span\>')
+        self.null_align_pattern = re.compile(r'\B\-\B')
         self.output_folder=output_folder
         self.current_book = ""
         self.current_chapter = ""
@@ -41,7 +42,24 @@ class ProcessBSBEnglish:
             if src_index < self.verse_start_indices[current_verse]:
                 self.verse_start_indices[current_verse] = src_index
 
-
+    def handle_bsb_specialnotations(self,row):
+        cell_text = str(row['BSB Version'])
+        if re.search(self.null_align_pattern, cell_text):
+            print(f"Found a null_align_pattern:{cell_text}")
+            self.usfm_str += re.sub(self.null_align_pattern, "", cell_text).strip()
+        else:
+            self.usfm_str += "\\w "
+            self.usfm_str += f"{cell_text} |"
+            if row['Language'] in ["Hebrew", "Aramaic"]:
+                bib = "WLC"
+                wrd_index = row['Heb Sort'] - self.src_index + 1
+            elif row["Language"] == "Greek":
+                bib = "Nestle"
+                wrd_index = row['Grk Sort'] - self.src_index + 1
+            if not pd.isna(row['Strongs']):
+                self.usfm_str += f"strong=\"{int(row['Strongs'])}\" "
+            self.usfm_str += f"srcloc=\"{bib}:{self.current_book}.{self.current_chapter}.{self.current_verse}.{int(wrd_index)}\" "
+            self.usfm_str += "\\w* "
 
     def row2usfm(self, row):
         verse_start = ""
@@ -57,18 +75,8 @@ class ProcessBSBEnglish:
             items = row['Cross References'].replace('(', '').replace(')', '')
             self.usfm_str += f'\\x + \\xo {self.current_chapter}:{self.current_verse}: \\xt {items} \\x* '
         if row['BSB Version'] is not np.NaN:
-            self.usfm_str += "\\w "
-            self.usfm_str += f"{row['BSB Version']} |"
-            if row['Language'] in ["Hebrew", "Aramaic"]:
-                bib = "WLC"
-                wrd_index = row['Heb Sort'] - self.src_index + 1
-            elif row["Language"] == "Greek":
-                bib = "Nestle"
-                wrd_index = row['Grk Sort'] - self.src_index + 1
-            if not pd.isna(row['Strongs']):
-                self.usfm_str += f"strong=\"{int(row['Strongs'])}\" "
-            self.usfm_str += f"srcloc=\"{bib}:{self.current_book}.{self.current_chapter}.{self.current_verse}.{int(wrd_index)}\" "
-            self.usfm_str += "\\w* "
+            self.handle_bsb_specialnotations(row)
+
         if row['Footnotes'] is not np.NaN:
             footnote_text = row['Footnotes'].replace("<i>", '"').replace("</i>", '"')
             footnote_text = re.sub(self.footnote_span_start_pattern, f"({self.current_book}.{self.current_chapter}.", footnote_text)
