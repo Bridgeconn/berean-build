@@ -16,6 +16,7 @@ class ProcessBSBEnglish:
         self.footnote_span_end_pattern = re.compile(r'\</span\>')
         self.null_align_pattern = re.compile(r'\B\-\B') # - without word surrounding it
         self.add_text_pattern = re.compile(r'\[[^\]]+\]') # [] enclosed text
+        self.curly_brace_pattern = re.compile(r'\{[^\}]*\}') # {} enclosed text
         self.output_folder=output_folder
         self.current_book = ""
         self.current_chapter = ""
@@ -81,6 +82,21 @@ class ProcessBSBEnglish:
                     self.usfm_str += f"\\add {add_entries[0][1:-1]}\\add* "
                     cell_text = cell_text.replace(add_entries[0], "", 1)
                     add_entries.pop(0)
+        elif re.search(self.curly_brace_pattern, cell_text):
+            norm_entries = re.findall(self.curly_brace_pattern, cell_text)
+            w_entries = re.split(self.curly_brace_pattern, cell_text)
+            while cell_text.strip() != "":
+                if w_entries and cell_text.startswith(w_entries[0]):
+                    if re.search(r'\w', w_entries[0]):
+                        self.form_w_marker(w_entries[0], row)
+                    else:
+                        self.usfm_str += f"{w_entries[0]} " 
+                    cell_text = cell_text.replace(w_entries[0], "", 1)
+                    w_entries.pop(0)
+                if norm_entries and cell_text.startswith(norm_entries[0]):
+                    self.usfm_str += f"{norm_entries[0][1:-1]} "
+                    cell_text = cell_text.replace(norm_entries[0], "", 1)
+                    norm_entries.pop(0)
         else:
             self.form_w_marker(cell_text, row)
 
