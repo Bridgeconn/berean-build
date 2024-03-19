@@ -14,8 +14,8 @@ class ProcessAlignment:
                  filepath, excel_sheet, header_row,output_folder="berean-build/output"):
         self.bsb_df = pd.read_excel(filepath, sheet_name=excel_sheet, header=header_row)
         self.ref_pattern = re.compile(r'(\d? ?[\w ]+) (\d+):(\d+)')
-        self.null_align_pattern = re.compile(r'\B\-\B')
-
+        self.null_align_pattern = re.compile(r'\B\-\B') # - without word surrounding it
+        self.add_text_pattern = re.compile(r'\[[^\]]+\]') # [] enclosed text
 
         self.align_df = pd.DataFrame( columns=["vref","source","target","alignment"])
         self.align_df.set_index('vref', inplace=True)
@@ -63,18 +63,37 @@ class ProcessAlignment:
                 trg_word_count = target_index - self.trg_start_indices[self.current_ref] + 1
     
             if not pd.isna(row["BSB Version"]):
-                if re.search(self.null_align_pattern, str(row['BSB Version'])):
-                    cell_text = re.sub(self.null_align_pattern, "", str(row['BSB Version'])).strip()
-                    if cell_text != "":
-                        self.source_text.append(cell_text)
+                cell_text = str(row['BSB Version'])
+                if re.search(self.null_align_pattern, cell_text):
+                    cell_text = re.sub(self.null_align_pattern, "", cell_text).strip()
+                    self.add_aligned_text_by_splitting(cell_text, trg_word_count=None)
+                elif re.search(self.add_text_pattern, cell_text):
+                    non_align_entries = re.findall(self.add_text_pattern, cell_text)
+                    align_entries = re.split(self.add_text_pattern, cell_text)
+                    while cell_text.strip() != "":
+                        if align_entries and cell_text.startswith(align_entries[0]):
+                            self.add_aligned_text_by_splitting(align_entries[0], trg_word_count)
+                            cell_text = cell_text.replace(align_entries[0], "", 1)
+                            align_entries.pop(0)
+                        if non_align_entries and cell_text.startswith(non_align_entries[0]):
+                            self.add_aligned_text_by_splitting(non_align_entries[0][1:-1], trg_word_count=None)
+                            cell_text = cell_text.replace(non_align_entries[0], "", 1)
+                            non_align_entries.pop(0)
                 else:
-                    self.source_text.append(str(row["BSB Version"]).strip())
-                    self.src_word_count += 1
-                    if trg_word_count is not None:
-                        self.alignment.append(f"{self.src_word_count}-{trg_word_count}")
+                    self.add_aligned_text_by_splitting(cell_text, trg_word_count)
         except Exception as exce:
             print(f"Issue at {row=}")
             print(exce)
+
+    def add_aligned_text_by_splitting(self, text, trg_word_count):
+        '''BSB cell can have more than one word. Split it to calculate pharaoh alignment'''
+        words = text.split(" ")
+        for wrd in words:
+            if wrd != "":
+                self.source_text.append(wrd)
+                self.src_word_count += 1
+                if trg_word_count is not None:
+                    self.alignment.append(f"{self.src_word_count}-{trg_word_count}")
 
     def get_trg_starts(self):
         for index, row in self.bsb_df.iterrows():
