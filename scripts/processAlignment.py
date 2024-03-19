@@ -16,6 +16,8 @@ class ProcessAlignment:
         self.ref_pattern = re.compile(r'(\d? ?[\w ]+) (\d+):(\d+)')
         self.null_align_pattern = re.compile(r'\B\-\B') # - without word surrounding it
         self.add_text_pattern = re.compile(r'\[[^\]]+\]') # [] enclosed text
+        self.curly_brace_pattern = re.compile(r'\{[^\}]*\}') # {} enclosed text
+        self.curly_or_sq_barces = re.compile(r'\[[^\]]+\]|\{[^\}]*\}')
 
         self.align_df = pd.DataFrame( columns=["vref","source","target","alignment"])
         self.align_df.set_index('vref', inplace=True)
@@ -67,9 +69,10 @@ class ProcessAlignment:
                 if re.search(self.null_align_pattern, cell_text):
                     cell_text = re.sub(self.null_align_pattern, "", cell_text).strip()
                     self.add_aligned_text_by_splitting(cell_text, trg_word_count=None)
-                elif re.search(self.add_text_pattern, cell_text):
-                    non_align_entries = re.findall(self.add_text_pattern, cell_text)
-                    align_entries = re.split(self.add_text_pattern, cell_text)
+                elif re.search(self.add_text_pattern, cell_text) or re.search(self.curly_brace_pattern, cell_text):
+                    non_align_entries = re.findall(self.curly_or_sq_barces, cell_text)
+                    align_entries = re.split(self.curly_or_sq_barces, cell_text)
+                    print(f"Found {non_align_entries=} and {align_entries=}")
                     while cell_text.strip() != "":
                         if align_entries and cell_text.startswith(align_entries[0]):
                             self.add_aligned_text_by_splitting(align_entries[0], trg_word_count)
