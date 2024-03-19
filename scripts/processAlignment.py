@@ -18,6 +18,8 @@ class ProcessAlignment:
         self.add_text_pattern = re.compile(r'\[[^\]]+\]') # [] enclosed text
         self.curly_brace_pattern = re.compile(r'\{[^\}]*\}') # {} enclosed text
         self.curly_or_sq_barces = re.compile(r'\[[^\]]+\]|\{[^\}]*\}')
+        self.up_align_pattern = re.compile(r'\. \. \.')
+        self.down_align_pattern = re.compile(r'vvv')
 
         self.align_df = pd.DataFrame( columns=["vref","source","target","alignment"])
         self.align_df.set_index('vref', inplace=True)
@@ -30,6 +32,8 @@ class ProcessAlignment:
         self.target_text = {}
         self.src_word_count = 0
         self.alignment = []
+        self.prev_src_indices = []
+        self.prev_trg_index = []
         self.bsb_df.apply(lambda row: self.row2alignment(row), axis=1)
         
         self.save_output_files(output_folder)
@@ -72,7 +76,6 @@ class ProcessAlignment:
                 elif re.search(self.add_text_pattern, cell_text) or re.search(self.curly_brace_pattern, cell_text):
                     non_align_entries = re.findall(self.curly_or_sq_barces, cell_text)
                     align_entries = re.split(self.curly_or_sq_barces, cell_text)
-                    print(f"Found {non_align_entries=} and {align_entries=}")
                     while cell_text.strip() != "":
                         if align_entries and cell_text.startswith(align_entries[0]):
                             self.add_aligned_text_by_splitting(align_entries[0], trg_word_count)
@@ -82,6 +85,11 @@ class ProcessAlignment:
                             self.add_aligned_text_by_splitting(non_align_entries[0][1:-1], trg_word_count=None)
                             cell_text = cell_text.replace(non_align_entries[0], "", 1)
                             non_align_entries.pop(0)
+                elif re.search(self.up_align_pattern, cell_text):
+                    for idx in self.prev_src_indices:
+                        self.alignment.append(f"{idx}-{trg_word_count}")
+                elif re.search(self.down_align_pattern, cell_text):
+                    self.prev_trg_index.append(trg_word_count)
                 else:
                     self.add_aligned_text_by_splitting(cell_text, trg_word_count)
         except Exception as exce:
@@ -91,12 +99,17 @@ class ProcessAlignment:
     def add_aligned_text_by_splitting(self, text, trg_word_count):
         '''BSB cell can have more than one word. Split it to calculate pharaoh alignment'''
         words = text.split(" ")
+        self.prev_src_indices = []
         for wrd in words:
             if wrd != "":
                 self.source_text.append(wrd)
                 self.src_word_count += 1
+                self.prev_src_indices.append(self.src_word_count)
                 if trg_word_count is not None:
                     self.alignment.append(f"{self.src_word_count}-{trg_word_count}")
+                    for idx in self.prev_trg_index:
+                        self.alignment.append(f"{self.src_word_count}-{idx}")
+        self.prev_trg_index = []
 
     def get_trg_starts(self):
         for index, row in self.bsb_df.iterrows():
