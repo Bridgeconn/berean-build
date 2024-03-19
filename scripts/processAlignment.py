@@ -99,9 +99,12 @@ class ProcessAlignment:
     def add_aligned_text_by_splitting(self, text, trg_word_count):
         '''BSB cell can have more than one word. Split it to calculate pharaoh alignment'''
         words = text.split(" ")
-        self.prev_src_indices = []
+        prev_src_cleared = False
         for wrd in words:
             if wrd != "":
+                if not prev_src_cleared:
+                    self.prev_src_indices = []
+                    prev_src_cleared = True
                 self.source_text.append(wrd)
                 self.src_word_count += 1
                 self.prev_src_indices.append(self.src_word_count)
