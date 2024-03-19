@@ -17,6 +17,9 @@ class ProcessBSBEnglish:
         self.null_align_pattern = re.compile(r'\B\-\B') # - without word surrounding it
         self.add_text_pattern = re.compile(r'\[[^\]]+\]') # [] enclosed text
         self.curly_brace_pattern = re.compile(r'\{[^\}]*\}') # {} enclosed text
+        self.up_align_pattern = re.compile(r'\. \. \.')
+        self.down_align_pattern = re.compile(r'vvv')
+
         self.output_folder=output_folder
         self.current_book = ""
         self.current_chapter = ""
@@ -67,6 +70,10 @@ class ProcessBSBEnglish:
         cell_text = str(row['BSB Version'])
         if re.search(self.null_align_pattern, cell_text):
             self.usfm_str += re.sub(self.null_align_pattern, "", cell_text).strip()
+        elif re.search(self.up_align_pattern, cell_text):
+            pass
+        elif re.search(self.down_align_pattern, cell_text):
+            pass
         elif re.search(self.add_text_pattern, cell_text):
             add_entries = re.findall(self.add_text_pattern, cell_text)
             w_entries = re.split(self.add_text_pattern, cell_text)
