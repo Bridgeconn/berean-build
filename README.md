@@ -83,3 +83,10 @@ Continuous Integration is enabled on this repo for automatically generating outp
 
 If there is a change in the data, just add that new excel file to the input folder under same file name and with same column names inside. If done on github, or pushed to github, it will trigger this workflow and generate the corresponding outputs automatically. The updated outputs will be available in the output folder in the github repo itself. ( :warning: Workflow takes more that 15 minutes to complete.)
 
+## How special notations in BSB are handled?
+
+1. `-` : This indicates that the Heb/Grk text in that row do not have a English word corresponding to it. This symbol is excluded while creating English verse text. No entry for the corresponding Heb/Grk index in the Pharaoh alignment, though the Heb/Grk text is preserved.
+2. `[]`: This indicates that the English word enclosed doesn't have a direct correlation with any of the Heb/Grk text. The text is marked up as `\add`-translator's addition in USFM. In Pharaoh alignment, there is not entry for this English index, though it will be included in versetext.
+3. `{}`: This indicates that the alignment of the enclosed text is not with the Heb/Grk in that row, but elsewhere. As we do not have that alignment information it is treated similar to `[]`. But in USFM it is given as plain text, not enclosing in `\add` or `\w`.
+4. `. . .`: This indicates that the alignment of the above cell's text is also with the Heb/Grk word in this row. The symbol is excluded in verse text. There will be additional alignments in pharaoh alignment for the Heb/Grk index and prev row's English.
+5. `vvv`: This indicates that the alignment of the below cell's English text is also with the Heb/Grk word in this row. The symbol is exluded in verse text. There will be additional alignments in pharaoh alignment for the Heb/Grk index and next row's English.
